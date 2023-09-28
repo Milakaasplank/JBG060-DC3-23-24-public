@@ -4,3 +4,8 @@ geopandas == 0.13.2
 matplotlib == 3.7.2
 seaborn == 0.12.2
 statsmodels == 0.14.0
+explainerdashboard == 0.4.3
+xarray == 2023.9.0
+netcdf4 == 1.6.2
+h5netcdf == 1.2.0
+numpy == 1.22.3
