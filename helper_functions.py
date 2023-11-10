@@ -68,6 +68,42 @@ def extract_words_from_string(dataframe, column):
 
     return dataframe
 
+def yake_top_keywords_summary(df):
+    # Assuming 'df' is your DataFrame and 'paragraphs_3_keywords_2gram_summary' is the column name you want to clean
+    df['paragraphs_3_keywords_2gram_summary'] = df['paragraphs_3_keywords_2gram_summary'].astype(str).str.findall(r'\((.*?)\,')
+    df['paragraphs_3_keywords_2gram_summary'].to_list()
+    keywords_list = []
+    for index, row in df.iterrows():
+        for item in row['paragraphs_3_keywords_2gram_summary']:
+            keywords_list.append(item)
+
+    # Count the keywords and sort them using the Counter library
+    counts = Counter(keywords_list)
+
+    # Create a dataframe to sort the keywords more easily
+    keywords_yake_summary = pd.DataFrame.from_dict(counts, orient='index').reset_index()
+    keywords_yake_summary.rename( columns={0 :'values'}, inplace=True )
+    keywords_yake_summary.sort_values(by='values', ascending=False)
+    print(keywords_yake_summary)
+
+def yake_top_keywords_paragraph(df):
+    # Assuming 'df' is your DataFrame and 'paragraphs_3_keywords_2gram_summary' is the column name you want to clean
+    df['keywords_paragraphs'] = df['keywords_paragraphs'].astype(str).str.findall(r'\((.*?)\,')
+    df['keywords_paragraphs'].to_list()
+    keywords_list = []
+    for index, row in df.iterrows():
+        for item in row['keywords_paragraphs']:
+            keywords_list.append(item)
+
+    # Count the keywords and sort them using the Counter library
+    counts = Counter(keywords_list)
+
+    # Create a dataframe to sort the keywords more easily
+    keywords_yake_summary = pd.DataFrame.from_dict(counts, orient='index').reset_index()
+    keywords_yake_summary.rename( columns={0 :'values'}, inplace=True )
+    keywords_yake_summary.sort_values(by='values', ascending=False)
+    print(keywords_yake_summary)
+
 def find_intersection(list1, list2):
     """Function to find the intersection between two lists
     Input: two lists containing strings"""
@@ -261,11 +297,11 @@ def create_news_features(input_news_df, columns):
         cols.append(col)
     return pd.concat(cols, axis=1)
 
-def train_model_logistic(features_df):
+def train_model_logistic(features_df, ipc_df):
     """
     Takes dataframe with keywords as input and returns the MAE, R2, train accuraccy and test accuraccy for each number of features.
     """
-    ndf = features_df.copy()
+    ndf = ipc_df.copy()
     ndf.sort_index(level=0, inplace=True) # Sort DataFrame by date
     ndf = ndf.iloc[ndf['ipc'].notnull().argmax():].copy() # Drop rows until first notna value in ipc column
     ndf = ndf.join(features_df, how="left") # Join df with created news features
@@ -356,10 +392,10 @@ def train_model_logistic(features_df):
     print(f"All test accuracy values: {all_test_accuraccy}")
     return all_mae_values, all_r2_values, all_train_accuraccy, all_test_accuraccy
 
-def train_model_only_articles_logistic(features_df):
+def train_model_only_articles_logistic(features_df, ipc_df):
 
 
-    ndf = df.copy()
+    ndf = ipc_df.copy()
     ndf.sort_index(level=0, inplace=True) # Sort DataFrame by date
     ndf = ndf.iloc[ndf['ipc'].notnull().argmax():].copy() # Drop rows until first notna value in ipc column
     ndf = ndf.join(features_df, how="left") # Join df with created news features
@@ -449,10 +485,10 @@ def train_model_only_articles_logistic(features_df):
     print(f"All test accuracy values: {all_test_accuraccy}")
     return all_mae_values, all_r2_values, all_train_accuraccy, all_test_accuraccy
 
-def train_model_only_articles_OLS(features_df):
+def train_model_only_articles_OLS(features_df, ipc_df):
 
 
-    ndf = df.copy()
+    ndf = ipc_df.copy()
     ndf.sort_index(level=0, inplace=True) # Sort DataFrame by date
     ndf = ndf.iloc[ndf['ipc'].notnull().argmax():].copy() # Drop rows until first notna value in ipc column
     ndf = ndf.join(features_df, how="left") # Join df with created news features
@@ -546,10 +582,10 @@ def train_model_only_articles_OLS(features_df):
     print(f"All test accuracy values: {all_test_accuraccy}")
     return all_mae_values, all_r2_values, all_train_accuraccy, all_test_accuraccy
 
-def train_model_OLS(features_df):
+def train_model_OLS(features_df, ipc_df):
 
 
-    ndf = df.copy()
+    ndf = ipc_df.copy()
     ndf.sort_index(level=0, inplace=True) # Sort DataFrame by date
     ndf = ndf.iloc[ndf['ipc'].notnull().argmax():].copy() # Drop rows until first notna value in ipc column
     ndf = ndf.join(features_df, how="left") # Join df with created news features
